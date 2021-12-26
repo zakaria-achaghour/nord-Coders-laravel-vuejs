@@ -12,4 +12,6 @@ class Customer extends Model
     protected $casts = [
         'is_favorite' => 'boolean',
     ];
+
+    protected $fillable = ['name', 'tel', 'is_favorite'];
 }

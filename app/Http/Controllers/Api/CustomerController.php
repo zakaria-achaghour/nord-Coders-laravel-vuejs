@@ -7,6 +7,7 @@ use App\Http\Resources\CustomerResource;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 
 class CustomerController extends Controller
 {
@@ -17,7 +18,7 @@ class CustomerController extends Controller
      */
     public function index(): AnonymousResourceCollection
     {
-        return CustomerResource::collection(Customer::all());
+        return CustomerResource::collection(Customer::latest()->get());
     }
 
     /**
@@ -28,7 +29,20 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string' ,
+            'tel' => 'required',
+            'is_favorite' => 'required|boolean',
+
+        ]);
+        Customer::create([
+            'name'=> $request->name,
+            'tel'=> $request->tel,
+            'is_favorite'=> $request->is_favorite,
+
+        ]);
+
+
     }
 
     /**
@@ -39,7 +53,7 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer)
     {
-        //
+        return CustomerResource::make($customer);
     }
 
     /**
@@ -51,7 +65,14 @@ class CustomerController extends Controller
      */
     public function update(Request $request, Customer $customer)
     {
-        //
+        $request->validate([
+            'name' => 'required|string' ,
+            'tel' => 'required',
+            'is_favorite' => 'required|boolean',
+
+        ]);
+
+        $customer->update($request->only(['name','tel','is_favorite']));
     }
 
     /**
@@ -60,8 +81,9 @@ class CustomerController extends Controller
      * @param  \App\Models\Customer  $customer
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Customer $customer)
+    public function destroy(Customer $customer): Response
     {
-        //
+            $customer->delete();
+            return response()->noContent();
     }
 }
